@@ -1,0 +1,13 @@
+.image-gallery {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(250px, 1fr));
+    gap: 16px;
+    padding: 16px;
+    list-style: none;
+    margin: 0 auto;
+}
+
+.image-gallery li {
+    display: flex;
+    justify-content: center;
+}
