@@ -1,8 +1,9 @@
-import React from 'react';
-
 const ErrorMessage = ({ message }) => {
   return (
-    <p>Bir Hata Oluştu Resim Galerisi Yüklenemedi Hata Mesajı:{message} </p>
+    <p>
+      An error occurred: The image gallery could not be loaded. Error message:
+      {message}{" "}
+    </p>
   );
 };
 

@@ -52,8 +52,7 @@ function App() {
     setLoading(false);
   };
 
-  const notification = () =>
-    toast.error("Lütfen Arama Yapmak İçin Metin Giriniz");
+  const notification = () => toast.error("Please enter text to search.");
 
   const submitHandler = (e) => {
     e.preventDefault();

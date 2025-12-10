@@ -1,5 +1,4 @@
-import React from 'react';
-import styles from './ImageCard.module.css';
+import styles from "./ImageCard.module.css";
 
 const ImageCard = ({ src, alt, imageOnclick, image }) => {
   const handleClick = () => {
