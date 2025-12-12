@@ -7,7 +7,7 @@ import ImageGallery from "./components/ImageGallery/ImageGallery";
 import { InfinitySpin } from "react-loader-spinner";
 import ErrorMessage from "./components/ErrorMessage/ErrorMessage";
 import LoadMoreBtn from "./components/LoadMoreBtn/LoadMoreBtn";
-import ReactModal from "react-modal";
+import Modal from "./components/Modal/Modal";
 
 function App() {
   const [images, setImages] = useState([]);
@@ -16,41 +16,33 @@ function App() {
   const [page, setPage] = useState(1);
   const [modalIsOpen, setIsOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
-
-  const customStyles = {
-    content: {
-      top: "50%",
-      left: "50%",
-      right: "auto",
-      bottom: "auto",
-      marginRight: "-50%",
-      transform: "translate(-50%, -50%)",
-      backgroundColor: "transparent",
-      border: "none",
-      borderRadius: "0",
-      padding: "0",
-    },
-    overlay: {
-      backgroundColor: "rgba(0, 0, 0, 0.7)",
-    },
-  };
-  ReactModal.setAppElement("#root");
+  const [errorMessage, SetErrorMessage] = useState("");
 
   const fetchPhotos = async (searchQuery, pageNum = 1, isLoadMore = false) => {
     setLoading(true);
+    SetErrorMessage("");
+
     try {
       const photos = await getPhotos(searchQuery, pageNum);
+
+      if (!photos || photos.length === 0) {
+        if (!isLoadMore) {
+          setImages([]);
+          SetErrorMessage("No images found. Try a different search.");
+        }
+        return;
+      }
+
       if (isLoadMore) {
         setImages((prev) => [...prev, ...photos]);
       } else {
         setImages(photos);
       }
     } catch (error) {
+      SetErrorMessage(error.message || "Something went wrong.");
+    } finally {
       setLoading(false);
-      return <ErrorMessage message={error.message} />;
     }
-    //
-    setLoading(false);
   };
 
   const notification = () => toast.error("Please enter text to search.");
@@ -87,7 +79,12 @@ function App() {
   return (
     <>
       <SearchBar onSubmit={submitHandler} onChange={searchBarHandler} />
-      <ImageGallery imageList={images} imageOnclick={imageClickHandler} />
+
+      {errorMessage ? (
+        <ErrorMessage message={errorMessage} />
+      ) : (
+        <ImageGallery imageList={images} imageOnclick={imageClickHandler} />
+      )}
       {loading && (
         <InfinitySpin
           height="80"
@@ -99,24 +96,12 @@ function App() {
           wrapperClass
         />
       )}
-      <ReactModal
+      <Modal
         isOpen={modalIsOpen}
-        onRequestClose={closeModal}
-        style={customStyles}
-        contentLabel="Image Modal"
-      >
-        {selectedImage && (
-          <img
-            src={selectedImage.urls?.regular}
-            alt={selectedImage.alt_description || selectedImage.id}
-            style={{
-              cursor: "pointer",
-              maxWidth: "90vw",
-              maxHeight: "90vh",
-            }}
-          />
-        )}
-      </ReactModal>
+        closeModal={closeModal}
+        selectedImage={selectedImage}
+      />
+
       {images.length !== 0 && <LoadMoreBtn onclick={handleLoadMore} />}
       <Toaster />
     </>
